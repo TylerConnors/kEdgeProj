@@ -4,6 +4,9 @@ spring 2015 WOU cs354 final project: max chromatic number of a graph
 
 ##    toDo List
 
+
+edit file and put an x in the [ ] to mark them
+
 #Explanation of Graph Theory
 
 - [ ] Explanation of property clear and appropriate and accurate mathematical terminology used
