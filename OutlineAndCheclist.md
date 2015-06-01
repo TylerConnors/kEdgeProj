@@ -9,7 +9,7 @@ edit file and put an x in the [ ] to mark them
 
 #Explanation of Graph Theory
 
-- [x] Explanation of property clear and appropriate and accurate mathematical terminology used
+- [ ] Explanation of property clear and appropriate and accurate mathematical terminology used
 
 - [ ] Example 1, clear and accurate
 
