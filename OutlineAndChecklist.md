@@ -20,7 +20,7 @@ once all are marked, we'll double check them.
 
 #Algorithm Explanation
 
-- [ ] Pseudocode is accurate 
+- [x] Pseudocode is accurate 
 
 - [ ] example of the algorithm
 
