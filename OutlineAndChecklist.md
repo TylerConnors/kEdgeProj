@@ -8,15 +8,15 @@ spring 2015 WOU cs354 final project: edge chromatic number of a graph
 edit file and put an x in the [ ] to mark them
 once all are marked, we'll double check them.
 
-#Explanation of Graph Theory
+# Explanation of Graph Theory 
 
 - [x] Explanation of property clear and appropriate and accurate mathematical terminology used
 
-- [ ] Example 1, clear and accurate
+- [x] Example 1, clear and accurate
 
-- [ ] Example 2, clear and accurate; showing something different than example 2
+- [x] Example 2, clear and accurate; showing something different than example 2
 
-- [ ] Input and output explained 
+- [x] Input and output explained 
 
 #Algorithm Explanation
 
