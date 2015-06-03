@@ -1,0 +1,13 @@
+This pseudocode was copied from the Wikipedia article “Misra & Gries edge coloring algorithm” [https://en.wikipedia.org/w/index.php?title=Misra_%26_Gries_edge_coloring_algorithm&oldid=652698160]
+Input: A graph G.
+Output: A proper coloring c of the edges of G
+Let U := E(G)
+while U ≠ ∅ do
+1. Let (u,v) be any edge in U. 
+2. Let F[1:k] be a maximal fan of u starting at F[1]=v. 
+3. Let c be a color that is free on u and d be a color that is free on F[k]. 
+4. Invert the cdu path 
+5. Let w ∈ V(G) be such that w ∈ F, F'=[F[1]...w] is a fan and d is free on w. 
+6. Rotate F' and set c(u,w)=d. 
+7. U := U - {(u,v)} 
+end while
