@@ -1,4 +1,4 @@
-coloring MisraAndGries(Graph graph) {
+Graph MisraAndGries(Graph graph) {
 	List<Edge> uncolored = graph.getEdges();
 	
 	while( !uncolored.isEmpty() ) {
@@ -11,7 +11,7 @@ coloring MisraAndGries(Graph graph) {
 		invertPath( edge.vertex[0], c, d ); //Finds a path containing the given vertex and contining nothing but edges of the given colors, then switches the colors
 		
 		Vertex vertex;
-		for( int i = 1; !vertex.hasColor( d ) && i < fan.length; ++i ) {
+		for( int i = 1; vertex.hasColor( d ) && i < fan.length; ++i ) {
 			vertex = fan[i];
 		}
 		
@@ -21,4 +21,6 @@ coloring MisraAndGries(Graph graph) {
 		edge.setColor( d );
 		uncolored.remove( edge );
 	}
+	
+	return graph; //Edges are now colored
 }
