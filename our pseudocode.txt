@@ -1,0 +1,24 @@
+coloring MisraAndGries(Graph graph) {
+	List<Edge> uncolored = graph.getEdges();
+	
+	while( !uncolored.isEmpty() ) {
+		Edge edge = uncolored[0]; //Any edge in uncolored will do
+		Fan fan = findFan( edge.vertex[0], edge.vertex[1] ); //The fan needs to be a fan of one vertex and its first element is the other vertex
+		
+		Color c = findFreeColor( edge.vertex[0] );
+		Color d = findFreeColor( edge.vertex[1] );
+		
+		invertPath( edge.vertex[0], c, d ); //Finds a path containing the given vertex and contining nothing but edges of the given colors, then switches the colors
+		
+		Vertex vertex;
+		for( int i = 1; !vertex.hasColor( d ) && i < fan.length; ++i ) {
+			vertex = fan[i];
+		}
+		
+		Fan secondFan = findFan( vertex ); //Find a fan of vertex. We don't care what the first element of the fan is, unlike above, so we don't specify.
+		secondFan.rotate();
+		
+		edge.setColor( d );
+		uncolored.remove( edge );
+	}
+}
