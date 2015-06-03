@@ -22,9 +22,9 @@ once all are marked, we'll double check them.
 
 - [x] Pseudocode is accurate 
 
-- [ ] example of the algorithm
+- [x] example of the algorithm
 
-- [ ] Explanation is well communicated
+- [x] Explanation is well communicated
 
 #Algorithm
 
