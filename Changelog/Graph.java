@@ -1,4 +1,4 @@
-this will be edited for other functions.
+//this will be edited for other functions.
 
 
 
@@ -64,8 +64,8 @@ this will be edited for other functions.
 public class Graph {
 	private final int V;
 	private int E;
-	private Bag<Integer>[] adj;
-	private Bag<Integer>[] color;
+	private Bag<Integer>[] adj; //what vertexes are connected at int I
+	private Bag<Integer>[] color;   //what colors are the edges of vertex at i 
 
 	/**
 	 * Initializes an empty graph with <tt>V</tt> vertices and 0 edges.
