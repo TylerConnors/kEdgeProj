@@ -59,10 +59,7 @@ public class Graph {
 	private int E;
 	private Node[] nodes;
 	private java.util.LinkedList<Edge> edges;
-	/*
-	to use, it's just like a linked list.
-	just use linkedListArray[i] to get the linked list of that vertex
-	 */
+
 
 	private static class Node
 	{
