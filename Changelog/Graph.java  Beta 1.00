@@ -1,30 +1,25 @@
 /**
-*   @author Tyler Connors
-*/
- 
-public class Graph {
+ *  @author Tyler Connors
+ */
+public class Graph 
+{
 	private final int V;
-	private int E;
+	private final int E;
 	private Node[] nodes;
 	private Edge[] edges;
-	
+
 	private static class Node
 	{
 		private java.util.LinkedList<Edge> adj;
 	}
-	
+
 	private static class Edge
 	{
 		private int color = 0; 
 		private Node V;	//vertex 1
 		private Node W ; //vertex 2
 	}
-	
-	/**
-	 * Initializes an empty graph with <tt>V</tt> vertices and 0 edges.
-	 * param V the number of vertices
-	 * @throws java.lang.IllegalArgumentException if <tt>V</tt> < 0
-	 */	
+
 
 	public Graph(int v,int numEdge) 
 	{
@@ -34,11 +29,17 @@ public class Graph {
 		nodes = new Node[v];
 		for (int i = 0; i < V; i++) 
 		{
+			nodes[i] = new Node();
 			nodes[i].adj = new java.util.LinkedList<Edge>();
 		}
-		edges = new Edge[numEdge];	
+		edges = new Edge[numEdge];
+		for (int i = 0; i < E; i++) 
+		{
+			edges[i] = new Edge();
+		}
+
 	}
-	
+
 	/**
 	 * Returns the number of vertices in the graph.
 	 * @return the number of vertices in the graph
@@ -62,7 +63,36 @@ public class Graph {
 			throw new IndexOutOfBoundsException("vertex " + v + " is not between 0 and " + (V-1));
 	}
 
-	
+	private boolean validateEdge(int v, int w)	//returns true if the edge does NOT exist in edges[]
+	{
+		for(Edge edge:edges)
+		{
+			if ((edge.V == nodes[v])&&(edge.W == nodes[w]))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public void addEdge(int num, int v, int w)  
+	{ 
+		validateVertex(v); 
+		validateVertex(w); 
+		if ((v != w) && (validateEdge(v,w) ==  true))				//allows no self loops or multiple edges
+		{
+			Edge edge = new Edge();				//create edge 
+			edge.V =nodes[v]; 
+			edge.W =nodes[w]; 
+			edge.color = 0;	
+
+			edges[num]=edge;			//adds edges to edge array and node adj lists
+			nodes[v].adj.add(edge);
+			nodes[w].adj.add(edge);
+		}
+	} 
+
+
 	//this changes the color of an edge(color represented by number)
 	//edges each have their own number
 	public void changeColor(int num,int edgeColor) 
@@ -81,7 +111,7 @@ public class Graph {
 		validateVertex(v);
 		return nodes[v].adj;
 	}
-	
+
 
 	/**
 	 * Returns the degree of vertex <tt>v</tt>.
@@ -94,5 +124,5 @@ public class Graph {
 		return nodes[v].adj.size();
 	}
 
-	
+
 }
