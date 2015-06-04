@@ -1,0 +1,98 @@
+/**
+*   @author Tyler Connors
+*/
+ 
+public class Graph {
+	private final int V;
+	private int E;
+	private Node[] nodes;
+	private Edge[] edges;
+	
+	private static class Node
+	{
+		private java.util.LinkedList<Edge> adj;
+	}
+	
+	private static class Edge
+	{
+		private int color = 0; 
+		private Node V;	//vertex 1
+		private Node W ; //vertex 2
+	}
+	
+	/**
+	 * Initializes an empty graph with <tt>V</tt> vertices and 0 edges.
+	 * param V the number of vertices
+	 * @throws java.lang.IllegalArgumentException if <tt>V</tt> < 0
+	 */	
+
+	public Graph(int v,int numEdge) 
+	{
+		if (v < 0) throw new IllegalArgumentException("Number of vertices must be nonnegative");
+		this.V = v;
+		this.E = numEdge;
+		nodes = new Node[v];
+		for (int i = 0; i < V; i++) 
+		{
+			nodes[i].adj = new java.util.LinkedList<Edge>();
+		}
+		edges = new Edge[numEdge];	
+	}
+	
+	/**
+	 * Returns the number of vertices in the graph.
+	 * @return the number of vertices in the graph
+	 */
+	public int V() {
+		return V;
+	}
+
+	/**
+	 * Returns the number of edges in the graph.
+	 * @return the number of edges in the graph
+	 */
+	public int E() {
+		return E;
+	}
+
+
+	// throw an IndexOutOfBoundsException unless 0 <= v < V
+	private void validateVertex(int v) {
+		if (v < 0 || v >= V)
+			throw new IndexOutOfBoundsException("vertex " + v + " is not between 0 and " + (V-1));
+	}
+
+	
+	//this changes the color of an edge(color represented by number)
+	//edges each have their own number
+	public void changeColor(int num,int edgeColor) 
+	{
+		edges[num].color = edgeColor;
+	}
+
+
+	/**
+	 * Returns the vertices adjacent to vertex <tt>v</tt>.
+	 * @return the vertices adjacent to vertex <tt>v</tt> as an Iterable
+	 * @param v the vertex
+	 * @throws java.lang.IndexOutOfBoundsException unless 0 <= v < V
+	 */
+	public Iterable<Edge> adj(int v) {
+		validateVertex(v);
+		return nodes[v].adj;
+	}
+	
+
+	/**
+	 * Returns the degree of vertex <tt>v</tt>.
+	 * @return the degree of vertex <tt>v</tt>
+	 * @param v the vertex
+	 * @throws java.lang.IndexOutOfBoundsException unless 0 <= v < V
+	 */
+	public int degree(int v) {
+		validateVertex(v);
+		return nodes[v].adj.size();
+	}
+
+	
+}
