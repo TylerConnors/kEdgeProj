@@ -1,0 +1,269 @@
+/**
+ *  @author Tyler Connors
+ */
+public class Graph 
+{
+	private final int V;
+	private final int E;
+	private Node[] nodes;
+	private Edge[] edges;
+
+	private static class Node
+	{
+		int number;
+		private java.util.LinkedList<Edge> adj;
+	}
+
+	private static class Edge
+	{
+		private int color = 0; 
+		private Node V;	//vertex 1
+		private Node W ; //vertex 2
+	}
+
+
+	public Graph(int v,int numEdge) 
+	{
+		if (v < 0) throw new IllegalArgumentException("Number of vertices must be nonnegative");
+		this.V = v;
+		this.E = numEdge;
+		nodes = new Node[v];
+		for (int i = 0; i < V; i++) 
+		{
+			nodes[i] = new Node();
+			nodes[i].number = i;
+			nodes[i].adj = new java.util.LinkedList<Edge>();
+		}
+		edges = new Edge[numEdge];
+		for (int i = 0; i < E; i++) 
+		{
+			edges[i] = new Edge();
+		}
+
+	}
+
+	/**
+	 * Returns the number of vertices in the graph.
+	 * @return the number of vertices in the graph
+	 */
+	public int V() {
+		return V;
+	}
+
+	/**
+	 * Returns the number of edges in the graph.
+	 * @return the number of edges in the graph
+	 */
+	public int E() {
+		return E;
+	}
+
+	public boolean hasColor(Node x, int d) 
+	{ 	
+		for(Edge edge: x.adj)
+		{
+			if (edge.color == d)
+				return true; 
+		} 
+		return false; 
+	} 
+
+	// throw an IndexOutOfBoundsException unless 0 <= v < V
+	private void validateVertex(int v) {
+		if (v < 0 || v >= V)
+			throw new IndexOutOfBoundsException("vertex " + v + " is not between 0 and " + (V-1));
+	}
+
+	private boolean validateEdge(int v, int w)	//returns true if the edge does NOT exist in edges[]
+	{
+		for(Edge edge:edges)
+		{
+			if ((edge.V == nodes[v])&&(edge.W == nodes[w]))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+
+	public Node traverse(Node node,Edge edge ) 
+	{
+		if (edge.V == node)
+			return edge.W;
+		else
+			return edge.V;
+	}
+
+
+	public void addEdge(int num, int v, int w)  
+	{ 
+		validateVertex(v); 
+		validateVertex(w); 
+		if ((v != w) && (validateEdge(v,w) ==  true))				//allows no self loops or multiple edges
+		{
+			Edge edge = new Edge();				//create edge 
+			edge.V =nodes[v]; 
+			edge.W =nodes[w]; 
+			edge.color = 0;	
+
+			edges[num]=edge;			//adds edges to edge array and node adj lists
+			nodes[v].adj.add(edge);
+			nodes[w].adj.add(edge);
+		}
+	} 
+
+
+	private void invertPath(java.util.LinkedList<Edge> path, int c, int d)
+	{
+		Edge edge = null;
+		while(path.isEmpty() == false)				//until all edges are checked
+		{
+			edge = path.removeLast();
+			for (int i = 0; i < E; i++) 
+			{
+				if (edges[i] == edge)
+				{
+					if(edges[i].color == c)
+						edges[i].color = d; 
+					else
+						edges[i].color = c;
+				}
+			}
+		}
+	}
+
+	/**
+	 * if c = d than there is no reason to invert it
+	 * the same if x does not contain either colors.
+	 * 
+	 * 
+	 **/
+	private java.util.LinkedList<Edge> findPath(Node x, int c, int d)
+	{
+		java.util.LinkedList<Edge> path  = new java.util.LinkedList<Edge>();	
+		if((c != d)&&( (hasColor(x,c) == true)||(hasColor(x,d) == true)))	
+		{
+
+			java.util.LinkedList<Edge> unchecked  = new java.util.LinkedList<Edge>();		//used to hold edges that have not been checked
+			java.util.LinkedList<Node> visited  = new java.util.LinkedList<Node>();
+			Edge temp = null;
+			Node curNode = null;
+			for(Edge edge: x.adj)			
+			{
+				if ((edge.color == c)||(edge.color == d))
+				{
+					path.add(edge);
+					unchecked.add(edge);
+
+				}	
+			} 
+			visited.add(x);
+			while(unchecked.isEmpty() == false)				//until all edges are checked
+			{
+				temp = unchecked.removeLast();
+
+				if ((visited.contains(temp.V))&&(visited.contains(temp.W)))		//do nothing this time
+				{
+					temp = null;
+				}
+				else if (visited.contains(temp.V))		// get node opposite of the visted node
+				{
+					curNode = traverse(temp.V,temp);
+
+					if (temp.color == c)				//find opposite colored edge
+					{
+						for(Edge edge: curNode.adj)
+						{
+							if (edge.color == d)		//found it
+							{
+								path.add(edge);
+								unchecked.add(edge);
+								visited.add(curNode);
+								break;
+							}
+						}
+					}
+					else								//same for rest
+					{
+						for(Edge edge: curNode.adj)
+						{
+							if (edge.color == c)
+							{
+								path.add(edge);
+								unchecked.add(edge);
+								visited.add(curNode);
+								break;
+							}
+						}
+					}
+				}
+				else
+				{
+					curNode = traverse(temp.W,temp);
+					if (temp.color == c)
+					{
+						for(Edge edge: curNode.adj)
+						{
+							if (edge.color == d)
+							{
+								path.add(edge);
+								unchecked.add(edge);
+								visited.add(curNode);
+							}
+						}
+					}
+					else
+					{
+						for(Edge edge: curNode.adj)
+						{
+							if (edge.color == c)
+							{
+								path.add(edge);
+								unchecked.add(edge);
+								visited.add(curNode);
+							}
+						}
+					}
+				}
+
+			}
+			return path;
+		}
+		return path;
+	}
+
+
+	//this changes the color of an edge(color represented by number)
+	//edges each have their own number
+	public void changeColor(int num,int edgeColor) 
+	{
+		edges[num].color = edgeColor;
+	}
+
+
+	/**
+	 * Returns the vertices adjacent to vertex <tt>v</tt>.
+	 * @return the vertices adjacent to vertex <tt>v</tt> as an Iterable
+	 * @param v the vertex
+	 * @throws java.lang.IndexOutOfBoundsException unless 0 <= v < V
+	 */
+	public Iterable<Edge> adj(int v) {
+		validateVertex(v);
+		return nodes[v].adj;
+	}
+
+
+	/**
+	 * Returns the degree of vertex <tt>v</tt>.
+	 * @return the degree of vertex <tt>v</tt>
+	 * @param v the vertex
+	 * @throws java.lang.IndexOutOfBoundsException unless 0 <= v < V
+	 */
+	public int degree(int v) {
+		validateVertex(v);
+		return nodes[v].adj.size();
+	}
+
+
+}
