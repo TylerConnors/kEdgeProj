@@ -1,0 +1,302 @@
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
+
+/**
+ * @author Tyler Connors
+ */
+public class Graph {
+	private final int V;
+	private final int E;
+	private Node[] nodes;
+	private Edge[] edges;
+
+	private static class Node {
+		private java.util.LinkedList<Edge> adj;
+
+		public boolean hasColor(int d) {
+			Iterator<Edge> it = this.adj.iterator();
+			while (it.hasNext()) {
+				if (it.next().color == d) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+	}
+
+	private static class Edge {
+		private int color = 0;
+		private Node V; // vertex 1
+		private Node W; // vertex 2
+
+		public Node theOtherNode(Node n) {
+			if(n.equals(V))
+			{
+				return W;
+			}else
+				return V;
+		}
+	}
+
+	public Graph(int v, int numEdge) {
+		if (v < 0)
+			throw new IllegalArgumentException(
+					"Number of vertices must be nonnegative");
+		this.V = v;
+		this.E = numEdge;
+		nodes = new Node[v];
+		for (int i = 0; i < V; i++) {
+			nodes[i] = new Node();
+			nodes[i].adj = new java.util.LinkedList<Edge>();
+		}
+		edges = new Edge[numEdge];
+		for (int i = 0; i < E; i++) {
+			edges[i] = new Edge();
+		}
+
+	}
+
+	/**
+	 * Returns the number of vertices in the graph.
+	 * 
+	 * @return the number of vertices in the graph
+	 */
+	public int V() {
+		return V;
+	}
+
+	/**
+	 * Returns the number of edges in the graph.
+	 * 
+	 * @return the number of edges in the graph
+	 */
+	public int E() {
+		return E;
+	}
+
+	// throw an IndexOutOfBoundsException unless 0 <= v < V
+	private void validateVertex(int v) {
+		if (v < 0 || v >= V)
+			throw new IndexOutOfBoundsException("vertex " + v
+					+ " is not between 0 and " + (V - 1));
+	}
+
+	private boolean validateEdge(int v, int w) // returns true if the edge does
+												// NOT exist in edges[]
+	{
+		for (Edge edge : edges) {
+			if ((edge.V == nodes[v]) && (edge.W == nodes[w])) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	public void addEdge(int num, int v, int w) {
+		validateVertex(v);
+		validateVertex(w);
+		if ((v != w) && (validateEdge(v, w) == true)) // allows no self loops or
+														// multiple edges
+		{
+			Edge edge = new Edge(); // create edge
+			edge.V = nodes[v];
+			edge.W = nodes[w];
+			edge.color = 0;
+
+			edges[num] = edge; // adds edges to edge array and node adj lists
+			nodes[v].adj.add(edge);
+			nodes[w].adj.add(edge);
+		}
+	}
+
+	// this changes the color of an edge(color represented by number)
+	// edges each have their own number
+	public void changeColor(int num, int edgeColor) {
+		edges[num].color = edgeColor;
+	}
+
+	public Graph MisraAndGries(Graph graph) {
+		Edge[] uncolored = new Edge[graph.E];
+		uncolored = graph.edges;
+		for (int i = 0; i < uncolored.length; i++) {
+			Edge edge = uncolored[i]; // Any edge in uncolored will do
+			Node[] fan = findFan(edge.V, edge.W); // The fan needs
+													// to be a fan
+			// of one vertex
+			// and its first
+			// element is
+			// the other
+			// vertex
+			int c = findFreeColor(edge.V);
+			int d = findFreeColor(edge.W);
+			invertPath(edge.V, c, d); // Finds a path containing the
+										// given vertex and contining
+										// nothing but edges of the
+										// given colors, then switches
+										// the colors
+			Node vertex = new Node();
+			for (int j = 1; vertex.hasColor(d) && j < fan.length; ++j) {
+				vertex = fan[j];
+			}
+			Node[] secondFan = findFan(vertex); // Find a fan of vertex. We
+												// don't
+												// care what the first element
+												// of the fan is, unlike above,
+												// so we don't specify.
+			rotate(secondFan);
+			edge.color = d;
+		}
+		return graph; // Edges are now colored
+	}
+
+	private void rotate(Node[] secondFan) {
+		Node temp = secondFan[secondFan.length - 1];
+		for (int i = secondFan.length - 1; i > 0; i--) {
+			secondFan[i] = secondFan[i - 1];
+		}
+		secondFan[0] = temp;
+	}
+
+	private void invertPath(Node v2, int c, int d) {
+		ArrayList<Edge> path = findPath(v2, c, d);
+		invertColors(path, c, d);
+	}
+
+	private ArrayList<Edge> findPath(Node v2, int c, int d) {
+		ArrayList<Edge> result = new ArrayList<Edge>();
+		if (c != d) {
+			Queue<Node> unprocessedVertices = new LinkedList<Node>();
+			ArrayList<Node> processedVertices = new ArrayList<Node>();
+			unprocessedVertices.add(v2);
+			Node currentVertex;
+			Node previousVertex = null;
+			while (!unprocessedVertices.isEmpty()) {
+				currentVertex = unprocessedVertices.remove();
+				if (!processedVertices.contains(currentVertex)) {
+					processedVertices.add(currentVertex);
+					if (previousVertex != null) { // Find the edge leading from
+													// the previous vertex to
+													// the current vertex
+						Iterator<Edge> it = previousVertex.adj.iterator();
+						while (it.hasNext()) {
+							Edge temp = it.next();
+							if (temp.theOtherNode(previousVertex) == currentVertex) {
+								result.add(temp);
+							}
+						}
+					}
+					Iterator<Edge> it = currentVertex.adj.iterator();
+					while (it.hasNext()) {
+						Edge temp = it.next();
+						if (temp.color == c || temp.color == d) {
+							unprocessedVertices.add(temp.theOtherNode(currentVertex));
+						}
+					}
+				}
+				previousVertex = currentVertex;
+			}
+		}
+		return result;
+	}
+
+	private void invertColors(ArrayList<Edge> path, int c, int d) {
+		Iterator<Edge> it = path.iterator();
+		while (it.hasNext()) {
+			Edge temp = it.next();
+			if (temp.color == c) {
+				temp.color = d;
+			} else {
+				temp.color = c;
+			}
+		}
+	}
+
+	private int findFreeColor(Node v2) {
+		boolean colorFound = true;
+		int color = -1;
+		for (int i = 1; i < Integer.MAX_VALUE && colorFound; i++) {
+			colorFound = false;
+			Iterator<Edge> it = v2.adj.iterator();
+			while (it.hasNext()) {
+				Edge temp = it.next();
+				if (temp.color == i) {
+					colorFound = true;
+					color = i;
+				}
+			}
+		}
+		return color;
+	}
+
+	private Node[] findFan(Node v, Node w) {
+		ArrayList<Node> temp = new ArrayList<Node>();
+		Node[] temp2 = findFan(v);
+		for (int i = 0; i < temp2.length; ++i) {
+			temp.add(temp2[i]);
+		}
+
+		if (temp.contains(w)) {
+			temp.remove(w);
+			temp.add(0, w);
+		} else {
+			System.err.println("Node w not in fan");
+		}
+
+		return (Node[]) temp.toArray();
+	}
+
+	private Node[] findFan(Node v) {
+		ArrayList<Node> fanNodes = new ArrayList<Node>();
+		Iterator<Edge> it = v.adj.iterator();
+		while (it.hasNext()) {
+			Edge temp = it.next();
+			if (temp.color == 0) { // Uncolored: Put it first
+				if (v == temp.V) {
+					fanNodes.add(0, temp.W);
+				} else {
+					fanNodes.add(0, temp.V);
+				}
+
+			} else {
+				if (v == temp.V) {
+					fanNodes.add(temp.W);
+				} else {
+					fanNodes.add(temp.V);
+				}
+			}
+		}
+		return (Node[]) fanNodes.toArray();
+	}
+
+	/**
+	 * Returns the vertices adjacent to vertex <tt>v</tt>.
+	 * 
+	 * @return the vertices adjacent to vertex <tt>v</tt> as an Iterable
+	 * @param v
+	 *            the vertex
+	 * @throws java.lang.IndexOutOfBoundsException
+	 *             unless 0 <= v < V
+	 */
+	public Iterable<Edge> adj(int v) {
+		validateVertex(v);
+		return nodes[v].adj;
+	}
+
+	/**
+	 * Returns the degree of vertex <tt>v</tt>.
+	 * 
+	 * @return the degree of vertex <tt>v</tt>
+	 * @param v
+	 *            the vertex
+	 * @throws java.lang.IndexOutOfBoundsException
+	 *             unless 0 <= v < V
+	 */
+	public int degree(int v) {
+		validateVertex(v);
+		return nodes[v].adj.size();
+	}
+
+}
