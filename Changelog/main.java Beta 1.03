@@ -1,0 +1,56 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+public class main {
+
+	public static void main(String[] args) 
+	{
+		String filename = "test.graph";
+		
+		if( args.length == 1 ) {
+			filename = args[0];
+		}
+		
+		Scanner scanner = null;
+		try 
+		{
+			scanner = new Scanner(new File( filename ));
+		} 
+		catch (FileNotFoundException e) 
+		{
+			e.printStackTrace();
+		}
+		scanner.nextLine();			// skips the U at the top
+		int Vertex = scanner.nextInt();
+		int Edges = scanner.nextInt();
+		
+		Graph G = new Graph(Vertex,Edges);
+		int v=0;
+		int w=0;
+		for (int i = 0; i < Edges; i++) {
+			v = scanner.nextInt();
+			w = scanner.nextInt();
+			G.addEdge(i, v, w);
+		}
+		scanner.close();
+		
+		G.MisraAndGries();
+		
+		System.out.println( "Colors found:" );
+		
+		ArrayList<Graph.Edge> edges = G.getEdges();
+		
+		if( edges.size() == 0 ) {
+			System.out.println( "None. Graph has no edges." );
+		} else {
+			Iterator<Graph.Edge> it = edges.iterator();
+			while( it.hasNext() ) {
+				Graph.Edge e = it.next();
+				System.out.println("Edge " + G.getNodeNumber( e.V ) + "-" + G.getNodeNumber( e.W ) + " has color " + e.color );
+			}
+		}
+	}
+}
